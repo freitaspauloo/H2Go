@@ -1,0 +1,151 @@
+@import "tailwindcss";
+
+@theme inline {
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-inter-tight), var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-serif: var(--font-instrument-serif), Georgia, serif;
+
+  /* Design 1 — Evergreen (Cleanora ref) · deep navy + electric cyan */
+  --color-ev-bg: #f1f5f9;
+  --color-ev-ink: #0a1f36;
+  --color-ev-forest: #0d2f52;
+  --color-ev-forest-deep: #08213b;
+  --color-ev-lime: #5fe0ff;
+  --color-ev-lime-soft: #b6f1ff;
+  --color-ev-muted: #64748b;
+  --color-ev-accent: #1e6fd9;
+
+  /* Design 2 — Meadow (Finaro ref) · ocean blue + sky */
+  --color-md-outer: #1c4f86;
+  --color-md-outer-deep: #103a66;
+  --color-md-paper: #f8fbfe;
+  --color-md-ink: #0c1f36;
+  --color-md-green: #14416f;
+  --color-md-lime: #6ed3ff;
+  --color-md-lime-soft: #d8f1ff;
+  --color-md-line: #e0e9f2;
+
+  /* Design 3 — Northlight (Upmind ref) · midnight + electric blue */
+  --color-nl-ink: #0a1626;
+  --color-nl-deep: #060e1a;
+  --color-nl-lime: #4fd0ff;
+  --color-nl-paper: #f4f7fb;
+  --color-nl-mist: #cfe1f2;
+
+  /* Design 4 — Signal (Rachel ref) · vivid blue frame on black */
+  --color-sg-orange: #1f6dff;
+  --color-sg-orange-deep: #1557d8;
+  --color-sg-black: #0a0b0e;
+  --color-sg-graphite: #141721;
+  --color-sg-paper: #eef3fb;
+  --color-sg-muted: #848c9c;
+}
+
+:root {
+  color-scheme: light;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background: #5fe0ff;
+  color: #0a1f36;
+}
+
+@layer utilities {
+  .font-display {
+    font-family: var(--font-display);
+  }
+  .font-serif {
+    font-family: var(--font-serif);
+  }
+  .text-balance {
+    text-wrap: balance;
+  }
+  .text-pretty {
+    text-wrap: pretty;
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .mask-fade-x {
+    -webkit-mask-image: linear-gradient(
+      to right,
+      transparent,
+      black 12%,
+      black 88%,
+      transparent
+    );
+    mask-image: linear-gradient(to right, transparent, black 12%, black 88%, transparent);
+  }
+  .noise::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.06;
+    mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160' viewBox='0 0 160 160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+}
+
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-marquee {
+  animation: marquee var(--marquee-duration, 40s) linear infinite;
+}
+
+.animate-marquee:hover {
+  animation-play-state: paused;
+}
+
+@keyframes float-slow {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(0, -10px, 0);
+  }
+}
+
+.animate-float {
+  animation: float-slow var(--float-duration, 6s) ease-in-out infinite;
+}
+
+@keyframes spin-slow {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin-slow {
+  animation: spin-slow var(--spin-duration, 40s) linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-marquee,
+  .animate-float,
+  .animate-spin-slow {
+    animation: none;
+  }
+}
