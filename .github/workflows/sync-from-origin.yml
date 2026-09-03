@@ -1,0 +1,34 @@
+name: Sync H2Go assets from Origin
+
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/sync-from-origin.yml']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Clone complete source from Origin
+        run: git clone --depth 1 "ORIGIN_URL_PLACEHOLDER" /tmp/origin-src
+
+      - name: Sync public assets and package-lock
+        run: |
+          mkdir -p public/h2go
+          rsync -av /tmp/origin-src/public/h2go/ public/h2go/
+          cp /tmp/origin-src/package-lock.json package-lock.json
+
+      - name: Commit and push synced files
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add public/h2go package-lock.json
+          git diff --staged --quiet && echo "No changes to commit" && exit 0
+          git commit -m "Sync all H2Go assets from Origin workspace"
+          git push
