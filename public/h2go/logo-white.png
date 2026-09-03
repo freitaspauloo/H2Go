@@ -1,1 +1,1 @@
-FROM_FILE:/tmp/push-content-only.txt
+LOAD_FROM_FILE
