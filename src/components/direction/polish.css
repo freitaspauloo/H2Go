@@ -168,9 +168,11 @@
 .trial-lead{max-width:36em;margin:14px auto 0;color:#ffffffd1;font-size:16px;line-height:1.5}
 /* Hero prompt. A .quote-card laid out as one wide bar, so fields, progress and buttons are the stepper's own. One step shows at a time. */
 .quote-card.hero-prompt{width:100%;margin-top:26px;padding:32px 32px 34px;text-align:left;box-shadow:0 28px 70px -32px #061018e6}
-.hero-prompt .quote-progress{margin:0 0 24px}
+.hero-prompt .quote-progress{margin:0 0 18px}
 .prompt-head{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 14px;margin-bottom:14px}
-.hero-prompt .prompt-head h2{font-size:22px}
+.hero-prompt .prompt-head{margin:0 0 16px}
+.hero-prompt .prompt-head h2{margin:0;font-size:22px;letter-spacing:-.03em}
+.hero-prompt .prompt-head .quote-intro{flex:1;margin:0;font-size:14px;line-height:1.4}
 .prompt-count{display:inline-flex;align-self:center;margin-left:auto;font-size:12px;color:var(--muted)}
 .prompt-row{display:flex;align-items:flex-end;gap:16px}
 .prompt-fields{display:grid;grid-template-columns:minmax(0,1fr);flex:1;gap:12px;min-width:0}
@@ -195,6 +197,7 @@
 .prompt-ready-actions .text-button{color:var(--ink)}
 @media(max-width:720px){.quote-card.hero-prompt{padding:24px 16px 26px}.prompt-row,.prompt-foot{flex-direction:column;align-items:stretch;gap:14px}.hero-prompt .back-button{min-width:46px}.prompt-fields.step-1{grid-template-columns:minmax(0,1fr)}.prompt-fields.step-2{grid-template-columns:repeat(2,minmax(0,1fr))}.prompt-fields.step-2>:nth-child(n+3){grid-column:1/-1}.hero-prompt .quote-actions{flex-wrap:wrap}.hero-prompt .quote-actions .d-button{flex:1 0 auto}.hero-prompt .quote-ready dl{grid-template-columns:1fr;gap:10px}}
 @media(max-width:440px){.hero-prompt input::placeholder{font-size:14px}.hero-prompt .quote-actions .d-button{gap:8px;padding-inline:14px;font-size:13px}}
+.trial-actions{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin-top:26px}
 .trial-fill,.trial-ghost{display:inline-flex;align-items:center;justify-content:center;min-height:50px;padding:14px 22px;border-radius:999px;font-size:14px;font-weight:600;white-space:nowrap;transition:background .2s,border-color .2s,transform .2s}
 .trial-fill{background:var(--cyan);color:var(--navy)}
 .trial-fill:hover{background:#a4edff;transform:translateY(-2px)}
@@ -214,8 +217,6 @@
 .chip-e{top:46%;left:4%;animation:trial-float 7.4s ease-in-out infinite}
 @keyframes trial-float{50%{transform:translateY(-8px)}}
 @media(min-width:980px){.trial-chip{display:flex}}
-@media(max-width:1340px){.chip-c{left:2%}.chip-d{right:2%}}
-@media(max-width:1180px){.chip-c,.chip-d,.chip-e{display:none}}
 @media(max-width:1100px){.trial-copy{width:min(860px,calc(100% - 36px))}}
 @media(max-width:800px){.layout-switch{right:18px;bottom:22px}.layout-switch a{padding:7px 9px;font-size:10px}.trial-hero,.trial-north .trial-hero{align-items:flex-start;padding:96px 0 72px}.trial-phone,.trial-north .trial-phone{left:4px;bottom:8px;transform:none}.trial-copy h1{font-size:38px}.trial-scroll{display:none}}
 @media(max-width:560px){.trial-fill,.trial-ghost{width:100%}}

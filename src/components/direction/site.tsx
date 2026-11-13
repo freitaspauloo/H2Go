@@ -25,14 +25,14 @@ const utilityLinks = [
 ];
 
 /** One header for every page. `overlay` lets it sit clear over the homepage film until the hero scrolls away. */
-export function SiteHeader({ overlay = false }: { overlay?: boolean }) {
+export function SiteHeader({ overlay = false, homeQuote = '/#quote' }: { overlay?: boolean; homeQuote?: string }) {
   const [open, setOpen] = useState(false);
   const [past, setPast] = useState(false);
   const path = usePathname();
   const home = path === '/';
   const commercial = path.startsWith('/services/commercial');
   const cta = commercial ? commercialCta : residentialCta;
-  const quoteHref = home ? '/#quote' : commercial ? '/services/commercial#quote' : '/services/residential#quote';
+  const quoteHref = home ? homeQuote : commercial ? '/services/commercial#quote' : '/services/residential#quote';
   const close = () => setOpen(false);
 
   useEffect(() => {
@@ -61,7 +61,7 @@ export function SiteHeader({ overlay = false }: { overlay?: boolean }) {
     </div>
     {open && <nav id="mobile-navigation" className="d-mobile" aria-label="Mobile navigation">
       {navLinks.map(item => <Link onClick={close} key={item.href} href={item.href}>{item.label}<ArrowUpRight size={18} /></Link>)}
-      <Link onClick={close} href={home ? '/#quote' : '/services/residential#quote'}>{residentialCta}<ArrowUpRight size={18} /></Link>
+      <Link onClick={close} href={home ? homeQuote : '/services/residential#quote'}>{residentialCta}<ArrowUpRight size={18} /></Link>
       <Link onClick={close} href="/services/commercial#quote">{commercialCta}<ArrowUpRight size={18} /></Link>
       <div className="d-mobile-tools">
         {utilityLinks.map(item => { const Icon = item.icon; return <a key={item.href} href={item.href} onClick={close}><Icon size={17} aria-hidden="true" />{item.label}</a>; })}
@@ -102,8 +102,8 @@ export function SiteFooter() {
   </div></footer>;
 }
 
-export function DirectionShell({ children, overlayHeader = false }: { children: React.ReactNode; overlayHeader?: boolean }) {
-  return <div className="direction"><a className="skip-link" href="#main-content">Skip to content</a><SiteHeader overlay={overlayHeader} />{children}<SiteFooter /></div>;
+export function DirectionShell({ children, overlayHeader = false, homeQuote = '/#quote' }: { children: React.ReactNode; overlayHeader?: boolean; homeQuote?: string }) {
+  return <div className="direction"><a className="skip-link" href="#main-content">Skip to content</a><SiteHeader overlay={overlayHeader} homeQuote={homeQuote} />{children}<SiteFooter /></div>;
 }
 
 function Eyebrow({ children }: { children: React.ReactNode }) { return <p className="eyebrow"><span />{children}</p>; }
@@ -163,7 +163,7 @@ const heroChips = [
 
 export function Homepage({ initialLayout = 'signal' }: { initialLayout?: 'signal' | 'northlight' }) {
   const signal = initialLayout === 'signal';
-  return <DirectionShell overlayHeader>
+  return <DirectionShell overlayHeader homeQuote={signal ? '/#quote' : '/services/residential#quote'}>
     <main id="main-content">
       <div className="layout-switch" role="group" aria-label="Hero layout">
         <Link href="/" aria-current={signal ? 'page' : undefined}>04 Signal</Link>
@@ -179,7 +179,7 @@ export function Homepage({ initialLayout = 'signal' }: { initialLayout?: 'signal
           <div className="trial-copy">
             <h1>Bringing the <span className="highlight-text">shine</span> back to every surface.</h1>
             <p className="trial-lead">Mobile washing for homes and businesses across the GTA.</p>
-            <HeroPrompt />
+            {signal ? <HeroPrompt /> : <div className="trial-actions"><Link className="trial-fill" href="/services/residential#quote">{residentialCta}</Link><Link className="trial-ghost" href="/services/commercial#quote">{commercialCta}</Link></div>}
           </div>
           <a className="trial-phone" href={h2go.phoneHref}><Phone size={15} aria-hidden="true" />{h2go.phone}</a>
           {!signal && <p className="trial-scroll">Scroll</p>}

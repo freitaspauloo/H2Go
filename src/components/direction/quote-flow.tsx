@@ -71,6 +71,8 @@ export function HeroPrompt() {
   }
 
   const progress = <ol className="quote-progress" aria-label="Assessment request progress">{['Location', 'Service', 'Your details'].map((label, n) => <li key={label} className={n <= step ? 'active' : ''} aria-current={n === step ? 'step' : undefined}><span>{label}</span></li>)}</ol>;
+  const stepTitle = ['Where can we help?', 'What should we look at?', 'How can we reach you?'][step];
+  const stepIntro = ['Start with your city or postal code.', 'Choose the service you’d like to discuss.', 'H2GO confirms a time with you. Pricing follows the assessment.'][step];
 
   // Sits under the card, on the film, so the card holds only the progress strip and the fields. Shown on the three steps, not on the ready summary.
   const note = <p className="hero-prompt-note">Free, with no obligation. You share timing preferences. H2GO schedules.</p>;
@@ -94,6 +96,7 @@ export function HeroPrompt() {
 
   return <><form className="quote-card hero-prompt" id="quote" onSubmit={next}>
     {progress}
+    <div className="prompt-head" aria-live="polite"><h2>{stepTitle}</h2><p className="quote-intro">{stepIntro}</p></div>
     <div className="prompt-row">
       {/* The progress strip names the step and the placeholders name the fields, so nothing is labelled twice. aria-label keeps each field's name for screen readers. */}
       <div className={`prompt-fields step-${step}`} ref={fields}>
