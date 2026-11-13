@@ -3,9 +3,65 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import { siteContent } from "@/lib/content";
+import { h2go, services as sharedServices, stats, testimonial } from "@/lib/content";
 
-const { brand, nav, hero, services, about, testimonials, contact, footer } = siteContent;
+const brand = h2go;
+const nav = [
+  { label: "Services", href: "#services" },
+  { label: "About", href: "#about" },
+  { label: "Reviews", href: "#testimonials" },
+  { label: "Contact", href: "#contact" },
+];
+const hero = {
+  eyebrow: "Exterior care across Ontario",
+  headline: "A fresh start for every outdoor space.",
+  subheadline: h2go.description,
+  primaryCta: { label: "Get a free quote", href: "#contact" },
+  secondaryCta: { label: "Explore our services", href: "#services" },
+  stats: stats.slice(0, 3).map((stat) => ({
+    value: `${stat.value.toLocaleString("en-CA")}${stat.suffix}`,
+    label: stat.label,
+  })),
+};
+const services = {
+  eyebrow: "Our services",
+  title: "Thoughtful care for every property.",
+  description: "Hot water, steam and eco-friendly detergents for homes, businesses and facilities.",
+  items: sharedServices.map((service) => ({
+    title: service.title,
+    image: service.image,
+    description: service.blurb,
+    features: [service.tag],
+  })),
+};
+const about = {
+  eyebrow: "About H2GO",
+  title: "Power washing with care.",
+  description: h2go.description,
+  highlights: [
+    { title: "Eco-friendly", description: "Biodegradable detergents and careful rinsing." },
+    { title: "Always available", description: "Scheduled service and emergency clean-ups, 24/7/365." },
+  ],
+};
+const testimonials = {
+  eyebrow: "Customer stories",
+  title: "Properties brought back to life.",
+  items: [{ quote: testimonial.quote, author: testimonial.name, role: testimonial.role }],
+};
+const contact = {
+  title: "Let’s give your property a fresh start.",
+  description: "Tell us what needs cleaning and we’ll help you plan your next wash.",
+  phone: h2go.phone,
+  email: h2go.email,
+  serviceArea: "Ontario",
+  ctaHref: h2go.phoneHref,
+  ctaLabel: "Call H2GO",
+  formSubmitLabel: "Request a quote",
+};
+const footer = {
+  copyright: `© ${new Date().getFullYear()} ${h2go.name}`,
+  links: nav,
+};
 
 function useInView(threshold = 0.15) {
   const ref = useRef<HTMLDivElement>(null);

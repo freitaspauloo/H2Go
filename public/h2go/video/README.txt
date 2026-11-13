@@ -1,7 +1,7 @@
-Drop H2GO MP4s here to replace the YouTube embeds:
+H2GO films used as silent hero backgrounds (H.264, no audio, trimmed to the working footage):
 
-  fleet-wash.mp4             -> Design 03 hero      (YouTube 5u_iE_hFCF4)
-  monument-restoration.mp4   -> Design 03 closing   (YouTube TeDnoR-ewlI)
-  tower-wash.mp4             -> Design 04 hero      (YouTube L95M-ExvsrM)
+  residential-wash.mp4  -> homepage and Residential hero  (YouTube kBQDeD4Wipw)
+  tower-wash.mp4        -> Commercial hero                (YouTube L95M-ExvsrM)
+  fleet-wash.mp4        -> Fleet hero                     (YouTube 5u_iE_hFCF4)
 
-The VideoBackground component probes for the file and prefers it automatically.
+The VideoBackground component probes for the file and plays it when present.

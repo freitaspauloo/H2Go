@@ -12,20 +12,21 @@ const interTight = Inter_Tight({
   variable: "--font-inter-tight",
   subsets: ["latin"],
   display: "swap",
+  style: ["normal", "italic"],
 });
 
 const instrumentSerif = Instrument_Serif({
   variable: "--font-instrument-serif",
   subsets: ["latin"],
   weight: "400",
-  style: ["normal", "italic"],
+  style: "normal",
   display: "swap",
 });
 
 export const metadata: Metadata = {
-  title: "H2GO Mobile Wash — Design Explorations",
+  title: "H2GO Mobile Wash",
   description:
-    "Four landing page concepts for H2GO Mobile Wash, each built from a different visual reference.",
+    "Mobile washing for homes and businesses across the GTA.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
@@ -34,7 +35,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       lang="en"
       className={`${inter.variable} ${interTight.variable} ${instrumentSerif.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col">{children}<script src="/figma-capture-prep.js" defer /></body>
     </html>
   );
 }

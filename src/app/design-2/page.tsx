@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Meadow } from "./meadow";
+import Meadow from "./meadow";
 
 export const metadata: Metadata = {
   title: "H2GO — Meadow concept",

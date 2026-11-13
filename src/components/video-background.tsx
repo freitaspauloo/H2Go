@@ -1,91 +1,11 @@
 "use client";
 
-import { useEffect, useId, useRef, useState } from "react";
+import { useEffect, useId, useState } from "react";
 import Image from "next/image";
-import { motion } from "framer-motion";
 import clsx from "clsx";
 
-/* ------------------------------------------------------------------ */
-/* YouTube IFrame API loader (shared, loads once)                      */
-/* ------------------------------------------------------------------ */
-
-type YTPlayer = {
-  playVideo: () => void;
-  seekTo: (s: number, allow?: boolean) => void;
-  mute: () => void;
-  destroy: () => void;
-};
-
-type YTNamespace = {
-  Player: new (
-    el: HTMLElement | string,
-    opts: {
-      videoId: string;
-      playerVars: Record<string, string | number>;
-      events: {
-        onReady?: (e: { target: YTPlayer }) => void;
-        onStateChange?: (e: { data: number; target: YTPlayer }) => void;
-        onError?: () => void;
-      };
-    },
-  ) => YTPlayer;
-  PlayerState: { PLAYING: number; ENDED: number };
-};
-
-declare global {
-  interface Window {
-    YT?: YTNamespace;
-    onYouTubeIframeAPIReady?: () => void;
-  }
-}
-
-let ytPromise: Promise<YTNamespace> | null = null;
-
-function loadYouTubeAPI(): Promise<YTNamespace> {
-  if (typeof window === "undefined") return new Promise(() => {});
-  if (window.YT?.Player) return Promise.resolve(window.YT);
-  if (ytPromise) return ytPromise;
-  ytPromise = new Promise<YTNamespace>((resolve, reject) => {
-    const prev = window.onYouTubeIframeAPIReady;
-    window.onYouTubeIframeAPIReady = () => {
-      prev?.();
-      if (window.YT) resolve(window.YT);
-    };
-    const s = document.createElement("script");
-    s.src = "https://www.youtube.com/iframe_api";
-    s.async = true;
-    s.onerror = () => reject(new Error("YouTube IFrame API failed to load"));
-    document.head.appendChild(s);
-    setTimeout(() => reject(new Error("YouTube IFrame API timeout")), 15000);
-  });
-  return ytPromise;
-}
-
-/* ------------------------------------------------------------------ */
-/* Cover-fit maths for a 16:9 frame inside an arbitrary box            */
-/* ------------------------------------------------------------------ */
-
-function useCoverSize(ref: React.RefObject<HTMLElement | null>, aspect = 16 / 9, overscan = 1.12) {
-  const [size, setSize] = useState({ w: 0, h: 0 });
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    const measure = () => {
-      const { width, height } = el.getBoundingClientRect();
-      let w = width;
-      let h = w / aspect;
-      if (h < height) {
-        h = height;
-        w = h * aspect;
-      }
-      setSize({ w: Math.ceil(w * overscan), h: Math.ceil(h * overscan) });
-    };
-    measure();
-    const ro = new ResizeObserver(measure);
-    ro.observe(el);
-    return () => ro.disconnect();
-  }, [ref, aspect, overscan]);
-  return size;
+function postToPlayer(frame: HTMLIFrameElement, payload: object) {
+  frame.contentWindow?.postMessage(JSON.stringify(payload), "*");
 }
 
 /* ------------------------------------------------------------------ */
@@ -104,8 +24,6 @@ export type VideoBackgroundProps = {
   /** Start offset in seconds for the YouTube source. */
   start?: number;
   className?: string;
-  /** Extra overscan so player chrome never peeks in. */
-  overscan?: number;
 };
 
 export function VideoBackground({
@@ -116,10 +34,7 @@ export function VideoBackground({
   posterClassName,
   start = 0,
   className,
-  overscan = 1.12,
 }: VideoBackgroundProps) {
-  const boxRef = useRef<HTMLDivElement>(null);
-  const { w, h } = useCoverSize(boxRef, 16 / 9, overscan);
   const [playing, setPlaying] = useState(false);
   // null = probing, true = local file available, false = fall back to embed
   const [mp4Available, setMp4Available] = useState<boolean | null>(mp4 ? null : false);
@@ -143,75 +58,83 @@ export function VideoBackground({
     };
   }, [mp4]);
   const playerHostId = useId().replace(/[:]/g, "");
-  const playerRef = useRef<YTPlayer | null>(null);
 
   useEffect(() => {
     if (!useYouTube || !youtubeId) return;
-    let cancelled = false;
-    loadYouTubeAPI()
-      .then((YT) => {
-        if (cancelled) return;
-        playerRef.current = new YT.Player(playerHostId, {
-          videoId: youtubeId,
-          playerVars: {
-            autoplay: 1,
-            mute: 1,
-            controls: 0,
-            loop: 1,
-            playlist: youtubeId,
-            start,
-            playsinline: 1,
-            rel: 0,
-            modestbranding: 1,
-            iv_load_policy: 3,
-            disablekb: 1,
-            fs: 0,
-            origin: window.location.origin,
-          },
-          events: {
-            onReady: (e) => {
-              e.target.mute();
-              e.target.playVideo();
-            },
-            onStateChange: (e) => {
-              if (e.data === YT.PlayerState.PLAYING) setPlaying(true);
-              if (e.data === YT.PlayerState.ENDED) {
-                e.target.seekTo(start, true);
-                e.target.playVideo();
-              }
-            },
-          },
-        });
-      })
-      .catch(() => {
-        /* poster stays; nothing else to do */
-      });
-    return () => {
-      cancelled = true;
-      try {
-        playerRef.current?.destroy();
-      } catch {
-        /* noop */
+    const frame = document.getElementById(playerHostId) as HTMLIFrameElement | null;
+    if (!frame) return;
+
+    let current = 0;
+    let duration = 0;
+    let kicked = false;
+    const command = (func: string, args: unknown[] = []) => postToPlayer(frame, { event: "command", func, args });
+    const reveal = () => setPlaying(true);
+    const handshake = () => {
+      postToPlayer(frame, { event: "listening", id: playerHostId, channel: "widget" });
+      command("mute");
+      if (!kicked) {
+        kicked = true;
+        command("playVideo");
       }
-      playerRef.current = null;
+    };
+    const replay = () => {
+      command("seekTo", [start, true]);
+      command("playVideo");
+    };
+    const applyState = (state?: number) => {
+      if (state === 1) reveal();
+      if (state === 0) replay();
+      if (state === 2 || state === 5 || state === -1) command("playVideo");
+    };
+    const onMessage = (event: MessageEvent) => {
+      if (event.source !== frame.contentWindow) return;
+      let data: { event?: string; info?: number | { playerState?: number; currentTime?: number; duration?: number } } = {};
+      if (typeof event.data === "string") {
+        try {
+          data = JSON.parse(event.data);
+        } catch {
+          return;
+        }
+      } else if (event.data && typeof event.data === "object") {
+        data = event.data;
+      }
+      if (data.event === "onReady" || data.event === "initialDelivery") {
+        reveal();
+        command("mute");
+      }
+      if (data.event === "infoDelivery" && data.info && typeof data.info === "object") {
+        if (typeof data.info.currentTime === "number") current = data.info.currentTime;
+        if (typeof data.info.duration === "number") duration = data.info.duration;
+        if (duration > 1 && current >= duration - 0.4) replay();
+        if (typeof data.info.playerState === "number") applyState(data.info.playerState);
+      }
+      if (data.event !== "onStateChange") return;
+      applyState(typeof data.info === "number" ? data.info : data.info?.playerState);
+    };
+
+    const tick = window.setInterval(() => {
+      handshake();
+      command("getCurrentTime");
+      command("getDuration");
+    }, 1000);
+    const revealTimer = window.setTimeout(reveal, 700);
+
+    frame.addEventListener("load", handshake);
+    window.addEventListener("message", onMessage);
+    handshake();
+    return () => {
+      window.clearInterval(tick);
+      window.clearTimeout(revealTimer);
+      frame.removeEventListener("load", handshake);
+      window.removeEventListener("message", onMessage);
     };
   }, [useYouTube, youtubeId, playerHostId, start]);
 
   return (
-    <div ref={boxRef} className={clsx("absolute inset-0 overflow-hidden", className)} aria-hidden>
-      {/* Poster */}
-      <motion.div
-        className="absolute inset-0"
-        animate={{ opacity: playing ? 0 : 1 }}
-        transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
-      >
-        <Image src={poster} alt={posterAlt} fill priority sizes="100vw" className={clsx("object-cover", posterClassName)} />
-      </motion.div>
-
-      {/* Native video */}
+    <div className={clsx("pointer-events-none absolute inset-0 overflow-hidden [container-type:size]", className)} aria-hidden>
       {useMp4 && (
         <video
-          className="absolute left-1/2 top-1/2 h-full w-full -translate-x-1/2 -translate-y-1/2 object-cover"
+          className="absolute inset-0 h-full w-full object-cover"
           src={mp4}
           autoPlay
           muted
@@ -223,17 +146,29 @@ export function VideoBackground({
         />
       )}
 
-      {/* YouTube (cover-fit, chrome hidden by overscan, inert) */}
       {useYouTube && (
-        <motion.div
-          className="pointer-events-none absolute left-1/2 top-1/2"
-          style={{ width: w || "100%", height: h || "100%", x: "-50%", y: "-50%" }}
-          animate={{ opacity: playing ? 1 : 0 }}
-          transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
+        <div
+          className="absolute left-1/2 top-1/2"
+          style={{
+            width: "max(100cqw, calc(100cqh * 16 / 9))",
+            height: "max(100cqh, calc(100cqw * 9 / 16))",
+            transform: "translate(-50%, -50%)",
+          }}
         >
-          <div id={playerHostId} className="h-full w-full [&>iframe]:h-full [&>iframe]:w-full" />
-        </motion.div>
+          <iframe
+            id={playerHostId}
+            className="h-full w-full border-0"
+            src={`https://www.youtube-nocookie.com/embed/${youtubeId}?autoplay=1&mute=1&controls=0&playsinline=1&rel=0&modestbranding=1&iv_load_policy=3&disablekb=1&fs=0&start=${start}&enablejsapi=1`}
+            title=""
+            tabIndex={-1}
+            allow="autoplay; encrypted-media"
+          />
+        </div>
       )}
+
+      <div className="absolute inset-0 transition-opacity duration-700" style={{ opacity: useYouTube || playing ? 0 : 1 }}>
+        <Image src={poster} alt={posterAlt} fill priority sizes="100vw" className={clsx("object-cover", posterClassName)} />
+      </div>
     </div>
   );
 }
