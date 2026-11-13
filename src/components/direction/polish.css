@@ -80,7 +80,7 @@
 .quote-card{padding:32px;border-radius:20px;box-shadow:0 12px 40px -28px #0d2f5240}
 .direction .quote-top .eyebrow{font-size:11px;margin:0;letter-spacing:.08em}
 .quote-top>span:last-child{font-size:12px;color:var(--muted)}
-.quote-progress{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;list-style:none;padding:0;margin:25px 0 30px}
+.quote-progress{display:grid;grid-template-columns:repeat(auto-fit,minmax(0,1fr));gap:8px;list-style:none;padding:0;margin:25px 0 30px}
 .quote-progress li{border-top:3px solid #dce6ef;padding-top:9px;font-size:11px;color:var(--muted)}
 .quote-progress li.active{border-color:var(--blue);color:var(--navy)}
 .quote-progress li[aria-current=step]{font-weight:600}
@@ -176,8 +176,14 @@
 .prompt-count{display:inline-flex;align-self:center;margin-left:auto;font-size:12px;color:var(--muted)}
 .prompt-row{display:flex;align-items:flex-end;gap:16px}
 .prompt-fields{display:grid;grid-template-columns:minmax(0,1fr);flex:1;gap:12px;min-width:0}
-.prompt-fields.step-1{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
-.prompt-fields.step-2{grid-template-columns:repeat(4,minmax(0,1fr))}
+.prompt-fields.fields-contact{grid-template-columns:repeat(4,minmax(0,1fr))}
+.choice-grid{display:flex;flex-wrap:wrap;gap:8px;min-width:0}
+.choice{min-height:44px;padding:10px 16px;border:1px solid #d5e0ea;border-radius:999px;background:#f8fafc;color:var(--ink);font-size:14px;font-weight:600;line-height:1.3;text-align:left;cursor:pointer}
+.choice:hover,.choice.is-on{border-color:#19c3e6;background:#e7fbff;color:var(--navy)}
+.choice:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+.choice-grid.is-pair .choice{min-width:168px;min-height:56px;padding-inline:22px;font-size:16px;text-align:center}
+.quote-actions .d-button:disabled{opacity:.45;transform:none;cursor:not-allowed}
+.quote-card .choice-grid{margin-bottom:4px}
 .quote-card.hero-prompt label{margin-bottom:0}
 .hero-prompt .prompt-fields :is(input,select,textarea){min-height:56px;margin-top:0;padding:14px 16px;text-overflow:ellipsis}
 .hero-prompt .prompt-fields select{appearance:none;padding-right:48px;background-color:#f8fafc;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%235c6d80' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='m6 9 6 6 6-6'/></svg>");background-repeat:no-repeat;background-position:right 16px center;background-size:16px;text-overflow:ellipsis}
@@ -195,7 +201,7 @@
 .hero-prompt .quote-ready dd{margin:4px 0 0}
 .prompt-ready-actions{display:flex;flex-wrap:wrap;align-items:center;gap:6px 8px}
 .prompt-ready-actions .text-button{color:var(--ink)}
-@media(max-width:720px){.quote-card.hero-prompt{padding:24px 16px 26px}.prompt-row,.prompt-foot{flex-direction:column;align-items:stretch;gap:14px}.hero-prompt .back-button{min-width:46px}.prompt-fields.step-1{grid-template-columns:minmax(0,1fr)}.prompt-fields.step-2{grid-template-columns:repeat(2,minmax(0,1fr))}.prompt-fields.step-2>:nth-child(n+3){grid-column:1/-1}.hero-prompt .quote-actions{flex-wrap:wrap}.hero-prompt .quote-actions .d-button{flex:1 0 auto}.hero-prompt .quote-ready dl{grid-template-columns:1fr;gap:10px}}
+@media(max-width:720px){.quote-card.hero-prompt{padding:24px 16px 26px}.prompt-row,.prompt-foot{flex-direction:column;align-items:stretch;gap:14px}.hero-prompt .back-button{min-width:46px}.prompt-fields.fields-contact{grid-template-columns:repeat(2,minmax(0,1fr))}.prompt-fields.fields-contact>:nth-child(n+3){grid-column:1/-1}.hero-prompt .quote-actions{flex-wrap:wrap}.hero-prompt .quote-actions .d-button{flex:1 0 auto}.hero-prompt .quote-ready dl{grid-template-columns:1fr;gap:10px}}
 @media(max-width:440px){.hero-prompt input::placeholder{font-size:14px}.hero-prompt .quote-actions .d-button{gap:8px;padding-inline:14px;font-size:13px}}
 .trial-actions{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin-top:26px}
 .trial-fill,.trial-ghost{display:inline-flex;align-items:center;justify-content:center;min-height:50px;padding:14px 22px;border-radius:999px;font-size:14px;font-weight:600;white-space:nowrap;transition:background .2s,border-color .2s,transform .2s}

@@ -151,7 +151,7 @@ function ProgramBanner({ vertical, sub, id, href }: { vertical: Vertical; sub?: 
 }
 export function OngoingCare() { return <ProgramBanner vertical={verticals[1]} id="ongoing-care" href="/services/commercial#quote" />; }
 
-export function ContactSection() { return <section className="d-wrap d-section" id="contact"><div className="contact-panel"><div><Eyebrow>Your next fresh start</Eyebrow><h2>Let’s bring your<br />property <span className="highlight-text">back to life.</span></h2><p>Tell us what you have in mind.<br />We’ll help with the rest.</p><a href={h2go.phoneHref} className="contact-phone"><Phone size={20} />{h2go.phone}</a><p className="contact-alt">Business, fleet or facility? <Link href="/services/commercial#quote">{commercialCta} <ArrowRight size={15} /></Link></p></div><QuoteFlow id="contact-quote" vertical="residential" /></div></section>; }
+export function ContactSection() { return <section className="d-wrap d-section" id="contact"><div className="contact-panel"><div><Eyebrow>Your next fresh start</Eyebrow><h2>Let’s bring your<br />property <span className="highlight-text">back to life.</span></h2><p>Tell us what you have in mind.<br />We’ll help with the rest.</p><a href={h2go.phoneHref} className="contact-phone"><Phone size={20} />{h2go.phone}</a><p className="contact-alt">Business, fleet or facility? <Link href="/services/commercial#quote">{commercialCta} <ArrowRight size={15} /></Link></p></div><QuoteFlow id="contact-quote" /></div></section>; }
 
 const heroChips = [
   { label: 'Eco-friendly', icon: Leaf, className: 'chip-a' },
@@ -218,7 +218,7 @@ export function ServicePage({ vertical, interest, sub }: { vertical: Vertical; i
       <div className="service-overlay" />
       <div className="d-wrap service-hero-inner">
         <div className="service-hero-copy"><Eyebrow>{sub ? sub.careName : `${vertical.title} mobile wash`}</Eyebrow><h1>{headline.split('. ').map((line,i) => <span key={line} className={i ? 'accent' : ''}>{line}{i === 0 ? '.' : ''}{' '}</span>)}</h1><p>{summary}</p><a href="#offerings" className="inline-link">Explore {sub ? sub.title.toLowerCase() : vertical.title.toLowerCase()} services <ArrowRight size={18} /></a><div className="service-assurance"><span><Clock size={16} />24/7 service</span><span><Leaf size={16} />Eco-friendly products</span></div></div>
-        <QuoteFlow key={`${vertical.slug}-${sub?.slug ?? ''}-${interest ?? ''}`} vertical={vertical.slug} cta={vertical.cta} initialService={interest === 'homecare' && home ? 'Home Care Club' : ''} />
+        <QuoteFlow key={`${vertical.slug}-${sub?.slug ?? ''}-${interest ?? ''}`} vertical={vertical.slug} family={sub?.slug} initialAreas={interest === 'homecare' && home ? ['Home Care Club'] : []} />
       </div>
     </section>
     <section className="d-wrap program-band"><p><strong>{home ? 'Home Care Club' : 'Ongoing Care'}</strong>{home ? 'A record of documented work at your home, with no membership fee.' : 'Tailored to each location, with a progress report after each shift.'}</p><Link className="inline-link" href={home ? '/#homecare' : '/#ongoing-care'}>{home ? 'About the Home Care Club' : 'About Ongoing Care'} <ArrowRight size={16} /></Link></section>
@@ -258,7 +258,7 @@ export function DetailPage({ vertical, offering, related, sub }: { vertical: Ver
           <details><summary>What does it cost?</summary><p>Pricing is confirmed during your free assessment, once the team understands the property.</p></details>
         </div>
       </div>
-      <QuoteFlow key={offering.slug} vertical={vertical.slug} cta={vertical.cta} initialService={offering.title} />
+      <QuoteFlow key={offering.slug} vertical={vertical.slug} family={sub?.slug} areas={sub ? [offering.title, ...offering.services] : undefined} initialAreas={[offering.title]} />
     </section>
     {offering.slug === 'deck-patio-power-washing' && <section className="d-wrap d-section comparison-section"><div><Eyebrow>See the difference</Eyebrow><h2>A little care.<br /><span className="highlight-text">A whole new outlook.</span></h2></div><ComparisonPreview /></section>}
     <ProgramBanner vertical={vertical} sub={sub} href="#quote" />
