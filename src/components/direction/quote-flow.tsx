@@ -1,6 +1,6 @@
 'use client';
-import { useEffect, useRef, useState, type FormEvent } from 'react';
-import { ArrowRight, Check, ChevronLeft, Mail } from 'lucide-react';
+import { createContext, useContext, useEffect, useRef, useState, type FormEvent, type ReactNode } from 'react';
+import { ArrowRight, ArrowUpRight, Check, ChevronLeft, Mail, X } from 'lucide-react';
 import { verticals, type SubVertical } from '@/lib/service-catalog';
 
 type Audience = 'residential' | 'commercial';
@@ -47,7 +47,13 @@ function areasFor(audience: Audience, familySlug: string) {
   return labels;
 }
 
-function AssessmentFlow({ variant, id, lockedAudience, lockedFamily = '', initialAreas = [], areas }: {
+function phaseAfterLocation(lockedAudience?: Audience, lockedFamily?: string): Phase {
+  if (!lockedAudience) return 'audience';
+  if (lockedAudience === 'commercial' && !lockedFamily) return 'family';
+  return 'areas';
+}
+
+function AssessmentFlow({ variant, id, lockedAudience, lockedFamily = '', initialAreas = [], areas, locationTitle, seededArea = '', skipLocation = false }: {
   variant: 'hero' | 'card';
   id: string;
   lockedAudience?: Audience;
@@ -55,9 +61,13 @@ function AssessmentFlow({ variant, id, lockedAudience, lockedFamily = '', initia
   initialAreas?: string[];
   /** Service areas for this page. Omit to use the audience or business type. */
   areas?: string[];
+  /** Replaces "Where can we help?" on the location step. */
+  locationTitle?: string;
+  seededArea?: string;
+  skipLocation?: boolean;
 }) {
-  const [phase, setPhase] = useState<Phase>('location');
-  const [area, setArea] = useState('');
+  const [phase, setPhase] = useState<Phase>(skipLocation ? phaseAfterLocation(lockedAudience, lockedFamily) : 'location');
+  const [area, setArea] = useState(seededArea);
   const [audience, setAudience] = useState<Audience | ''>(lockedAudience ?? '');
   const [family, setFamily] = useState(lockedFamily);
   const [picked, setPicked] = useState<string[]>([]);
@@ -135,7 +145,7 @@ function AssessmentFlow({ variant, id, lockedAudience, lockedFamily = '', initia
   }
 
   const progress = <ol className="quote-progress" aria-label="Assessment request progress">{steps.map((item, n) => <li key={item} className={n <= (ready ? steps.length : index) ? 'active' : ''} aria-current={!ready && item === phase ? 'step' : undefined}><span>{phaseLabel[item]}</span></li>)}</ol>;
-  const [title, intro] = phaseCopy[phase];
+  const [title, intro] = phase === 'location' && locationTitle ? [locationTitle, phaseCopy.location[1]] : phaseCopy[phase];
   const choices = phase === 'audience'
     ? <div className="choice-grid is-pair" role="group" aria-label="Residential or commercial">{(['residential', 'commercial'] as const).map(item => <button type="button" key={item} className="choice" onClick={() => chooseAudience(item)}>{item === 'residential' ? 'Residential' : 'Commercial'}</button>)}</div>
     : phase === 'family'
@@ -200,12 +210,50 @@ function AssessmentFlow({ variant, id, lockedAudience, lockedFamily = '', initia
   </div>;
 }
 
-export function QuoteFlow({ vertical, family, initialAreas, areas, id = 'quote' }: { vertical?: string; family?: string; initialAreas?: string[]; areas?: string[]; id?: string }) {
+export function QuoteFlow({ vertical, family, initialAreas, areas, id = 'quote', locationTitle, seededArea, skipLocation }: { vertical?: string; family?: string; initialAreas?: string[]; areas?: string[]; id?: string; locationTitle?: string; seededArea?: string; skipLocation?: boolean }) {
   const audience = vertical === 'commercial' || vertical === 'residential' ? vertical : undefined;
-  return <AssessmentFlow variant="card" id={id} lockedAudience={audience} lockedFamily={family} initialAreas={initialAreas} areas={areas} />;
+  return <AssessmentFlow variant="card" id={id} lockedAudience={audience} lockedFamily={family} initialAreas={initialAreas} areas={areas} locationTitle={locationTitle} seededArea={seededArea} skipLocation={skipLocation} />;
 }
 
 /** Homepage hero. Same steps as the page forms, laid out as one wide bar. */
 export function HeroPrompt() {
   return <AssessmentFlow variant="hero" id="quote" />;
+}
+
+const AssessmentModalContext = createContext<() => void>(() => {});
+
+/** Opens the assessment modal used by buttons outside the hero and the bottom stepper. */
+export function useAssessmentRequest() {
+  return useContext(AssessmentModalContext);
+}
+
+export function AssessButton({ className, children }: { className?: string; children?: ReactNode }) {
+  const open = useAssessmentRequest();
+  return <button type="button" className={className} onClick={open}>{children ?? <>Request a FREE Assessment <ArrowUpRight size={18} /></>}</button>;
+}
+
+function AssessmentModal({ onClose }: { onClose: () => void }) {
+  const dialog = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    dialog.current?.querySelector<HTMLElement>('input')?.focus();
+    const onKey = (event: KeyboardEvent) => { if (event.key === 'Escape') onClose(); };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [onClose]);
+
+  return <div className="assess-modal" onClick={onClose}>
+    <div className="assess-dialog" role="dialog" aria-modal="true" aria-label={finalCta} ref={dialog} onClick={event => event.stopPropagation()}>
+      <button type="button" className="assess-close" aria-label="Close" onClick={onClose}><X size={18} /></button>
+      <AssessmentFlow variant="card" id="assess-quote" />
+    </div>
+  </div>;
+}
+
+export function AssessmentProvider({ children }: { children: ReactNode }) {
+  const [open, setOpen] = useState(false);
+  return <AssessmentModalContext.Provider value={() => setOpen(true)}>
+    {children}
+    {open && <AssessmentModal onClose={() => setOpen(false)} />}
+  </AssessmentModalContext.Provider>;
 }

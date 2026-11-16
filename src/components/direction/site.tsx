@@ -2,12 +2,11 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
-import { usePathname } from 'next/navigation';
 import { ArrowRight, ArrowUpRight, ChevronLeft, ChevronRight, Check, Menu, X, Play, Plus, Phone, Leaf, Clock, Waves, Home, Building2, User, Receipt } from 'lucide-react';
 import { h2go } from '@/lib/content';
 import { commercialCta, residentialCta, verticals, serviceHref, type Vertical, type Offering, type SubVertical } from '@/lib/service-catalog';
 import { VideoBackground } from '@/components/video-background';
-import { HeroPrompt, QuoteFlow } from './quote-flow';
+import { AssessmentProvider, AssessButton, HeroPrompt, QuoteFlow, useAssessmentRequest } from './quote-flow';
 import './site.css';
 import './polish.css';
 
@@ -25,14 +24,10 @@ const utilityLinks = [
 ];
 
 /** One header for every page. `overlay` lets it sit clear over the homepage film until the hero scrolls away. */
-export function SiteHeader({ overlay = false, homeQuote = '/#quote' }: { overlay?: boolean; homeQuote?: string }) {
+export function SiteHeader({ overlay = false }: { overlay?: boolean }) {
   const [open, setOpen] = useState(false);
   const [past, setPast] = useState(false);
-  const path = usePathname();
-  const home = path === '/';
-  const commercial = path.startsWith('/services/commercial');
-  const cta = commercial ? commercialCta : residentialCta;
-  const quoteHref = home ? homeQuote : commercial ? '/services/commercial#quote' : '/services/residential#quote';
+  const openAssessment = useAssessmentRequest();
   const close = () => setOpen(false);
 
   useEffect(() => {
@@ -56,13 +51,12 @@ export function SiteHeader({ overlay = false, homeQuote = '/#quote' }: { overlay
       <div className="nav-tools">
         {utilityLinks.map(item => { const Icon = item.icon; return <a key={item.href} className="nav-tool" href={item.href} aria-label={item.label} title={item.label}><Icon size={18} aria-hidden="true" /></a>; })}
       </div>
-      <Link href={quoteHref} className="d-button nav-cta">{cta}</Link>
+      <button type="button" className="d-button nav-cta" onClick={openAssessment}>Request a FREE Assessment</button>
       <button type="button" className="menu-button" aria-expanded={open} aria-controls="mobile-navigation" aria-label={open ? 'Close navigation' : 'Open navigation'} onClick={() => setOpen(!open)}>{open ? <X size={20} /> : <Menu size={20} />}</button>
     </div>
     {open && <nav id="mobile-navigation" className="d-mobile" aria-label="Mobile navigation">
       {navLinks.map(item => <Link onClick={close} key={item.href} href={item.href}>{item.label}<ArrowUpRight size={18} /></Link>)}
-      <Link onClick={close} href={home ? homeQuote : '/services/residential#quote'}>{residentialCta}<ArrowUpRight size={18} /></Link>
-      <Link onClick={close} href="/services/commercial#quote">{commercialCta}<ArrowUpRight size={18} /></Link>
+      <button type="button" className="d-mobile-assess" onClick={() => { close(); openAssessment(); }}>Request a FREE Assessment <ArrowUpRight size={18} /></button>
       <div className="d-mobile-tools">
         {utilityLinks.map(item => { const Icon = item.icon; return <a key={item.href} href={item.href} onClick={close}><Icon size={17} aria-hidden="true" />{item.label}</a>; })}
       </div>
@@ -88,8 +82,7 @@ export function SiteFooter() {
         <p className="footer-title">Customers</p>
         <a id="login" href="#login">Customer login</a>
         <a id="pay" href="#pay">Pay an invoice</a>
-        <Link href="/services/residential#quote">{residentialCta}</Link>
-        <Link href="/services/commercial#quote">{commercialCta}</Link>
+        <AssessButton className="footer-assess">Request a FREE Assessment</AssessButton>
       </nav>
       <div>
         <p className="footer-title">Contact</p>
@@ -102,8 +95,8 @@ export function SiteFooter() {
   </div></footer>;
 }
 
-export function DirectionShell({ children, overlayHeader = false, homeQuote = '/#quote' }: { children: React.ReactNode; overlayHeader?: boolean; homeQuote?: string }) {
-  return <div className="direction"><a className="skip-link" href="#main-content">Skip to content</a><SiteHeader overlay={overlayHeader} homeQuote={homeQuote} />{children}<SiteFooter /></div>;
+export function DirectionShell({ children, overlayHeader = false }: { children: React.ReactNode; overlayHeader?: boolean }) {
+  return <div className="direction"><AssessmentProvider><a className="skip-link" href="#main-content">Skip to content</a><SiteHeader overlay={overlayHeader} />{children}<SiteFooter /></AssessmentProvider></div>;
 }
 
 function Eyebrow({ children }: { children: React.ReactNode }) { return <p className="eyebrow"><span />{children}</p>; }
@@ -138,18 +131,18 @@ export function StoryCarousel({ first = 0 }: { first?: number }) {
 
 export function AboutSection() { return <section className="d-wrap d-section about-section" id="about"><div className="about-image"><Image src="/h2go/crew-1.jpg" alt="H2GO technician cleaning exterior masonry" fill sizes="(min-width:800px) 45vw,100vw" /></div><div><Eyebrow>The H2GO difference</Eyebrow><h2>Serious power.<br /><span className="highlight-text">Thoughtful care.</span></h2><p className="section-description">A proprietary mobile wash system, hot water and steam. A team that cares about the details. We bring them together to give your property a fresh start.</p><div className="benefit-grid">{[{ icon: Clock, title: 'Around your schedule', text: '24/7 service for planned visits and urgent cleanups.' }, { icon: Leaf, title: 'Eco-friendly products', text: 'Cleaning products selected with the environment in mind.' }, { icon: Waves, title: 'Hot water & steam', text: 'A method matched to the surface and the job.' }].map(b => <div key={b.title}><b.icon size={22} /><h3>{b.title}</h3><p>{b.text}</p></div>)}</div></div></section>; }
 
-export function HomeCare() { return <section className="d-wrap homecare-section" id="homecare"><div className="homecare-panel"><div><Eyebrow>Introducing the Home Care Club</Eyebrow><h2>More weekends.<br /><span className="highlight-text">Less maintenance.</span></h2><p>Home Facts is a record of documented H2GO work at your home. You can keep it and share it. You approve the plan, and there is no membership fee.</p><ul>{['No membership fee. One recurring service is enough to join.', 'You approve your care plan and pricing each year.', 'Change or cancel future services anytime, with no clawback on completed work.', 'You pay after each completed visit.'].map(text => <li key={text}><Check size={17} />{text}</li>)}</ul><Link className="d-button" href="/services/residential?interest=homecare#quote">{residentialCta} <ArrowUpRight size={18} /></Link></div><div className="homecare-photo"><Image src="/h2go/house.jpg" alt="H2GO residential wash van outside a home" fill sizes="(min-width:800px) 50vw,100vw" /></div></div></section>; }
+export function HomeCare() { return <section className="d-wrap homecare-section" id="homecare"><div className="homecare-panel"><div><Eyebrow>Introducing the Home Care Club</Eyebrow><h2>More weekends.<br /><span className="highlight-text">Less maintenance.</span></h2><p>Home Facts is a record of documented H2GO work at your home. You can keep it and share it. You approve the plan, and there is no membership fee.</p><ul>{['No membership fee. One recurring service is enough to join.', 'You approve your care plan and pricing each year.', 'Change or cancel future services anytime, with no clawback on completed work.', 'You pay after each completed visit.'].map(text => <li key={text}><Check size={17} />{text}</li>)}</ul><AssessButton className="d-button">Request a FREE Assessment <ArrowUpRight size={18} /></AssessButton></div><div className="homecare-photo"><Image src="/h2go/house.jpg" alt="H2GO residential wash van outside a home" fill sizes="(min-width:800px) 50vw,100vw" /></div></div></section>; }
 
 /** Slim program banner: Home Care Club for residential pages, Ongoing Care for commercial ones. */
-function ProgramBanner({ vertical, sub, id, href }: { vertical: Vertical; sub?: SubVertical; id?: string; href: string }) {
+function ProgramBanner({ vertical, sub, id }: { vertical: Vertical; sub?: SubVertical; id?: string }) {
   const home = vertical.slug === 'residential';
   const name = home ? 'Home Care Club' : sub ? `Ongoing Care · ${sub.careName}` : 'Ongoing Care';
   const text = home
     ? 'No membership fee. You approve the plan and pay after each completed visit.'
     : sub ? 'Tailored to each location, with a progress report after every shift.' : 'A report after every shift. Property Care, Facility Care, District Care or Fleet Care.';
-  return <section className="d-wrap care-banner" id={id}><div><Eyebrow>{name}</Eyebrow><p>{text}</p></div><Link className="d-button" href={href}>{vertical.cta} <ArrowUpRight size={18} /></Link></section>;
+  return <section className="d-wrap care-banner" id={id}><div><Eyebrow>{name}</Eyebrow><p>{text}</p></div><AssessButton className="d-button">Request a FREE Assessment <ArrowUpRight size={18} /></AssessButton></section>;
 }
-export function OngoingCare() { return <ProgramBanner vertical={verticals[1]} id="ongoing-care" href="/services/commercial#quote" />; }
+export function OngoingCare() { return <ProgramBanner vertical={verticals[1]} id="ongoing-care" />; }
 
 export function ContactSection() { return <section className="d-wrap d-section" id="contact"><div className="contact-panel"><div><Eyebrow>Your next fresh start</Eyebrow><h2>Let’s bring your<br />property <span className="highlight-text">back to life.</span></h2><p>Tell us what you have in mind.<br />We’ll help with the rest.</p><a href={h2go.phoneHref} className="contact-phone"><Phone size={20} />{h2go.phone}</a><p className="contact-alt">Business, fleet or facility? <Link href="/services/commercial#quote">{commercialCta} <ArrowRight size={15} /></Link></p></div><QuoteFlow id="contact-quote" /></div></section>; }
 
@@ -163,7 +156,7 @@ const heroChips = [
 
 export function Homepage({ initialLayout = 'signal' }: { initialLayout?: 'signal' | 'northlight' }) {
   const signal = initialLayout === 'signal';
-  return <DirectionShell overlayHeader homeQuote={signal ? '/#quote' : '/services/residential#quote'}>
+  return <DirectionShell overlayHeader>
     <main id="main-content">
       <div className="layout-switch" role="group" aria-label="Hero layout">
         <Link href="/" aria-current={signal ? 'page' : undefined}>04 Signal</Link>
@@ -200,7 +193,7 @@ export function OfferingGrid({ vertical, items, hrefFor }: { vertical: Vertical;
       <Link href={to(o)} className="offering-image" aria-label={o.title}><Image src={o.image} alt="" fill sizes="(min-width:800px) 33vw,100vw" /></Link>
       <div className="offering-overview"><h3><Link href={to(o)}>{o.title}</Link></h3><p>{o.description}</p><p>{o.services.join(' · ')}</p></div>
       <button className="offering-toggle" aria-expanded={open === o.slug} aria-controls={`offering-${o.slug}`} onClick={() => setOpen(open === o.slug ? null : o.slug)}><span>How we help</span><Plus size={18} /></button>
-      <div id={`offering-${o.slug}`} hidden={open !== o.slug}><p>We’ll discuss the surface, access and the work you need, then plan an appropriate wash for your property.</p><Link href={`${to(o)}#quote`} className="inline-link">{vertical.cta} <ArrowRight size={16} /></Link></div>
+      <div id={`offering-${o.slug}`} hidden={open !== o.slug}><p>We’ll discuss the surface, access and the work you need, then plan an appropriate wash for your property.</p><AssessButton className="inline-link">Request a FREE Assessment <ArrowRight size={16} /></AssessButton></div>
       <Link className="offering-detail-link" href={to(o)}>Explore service <ArrowUpRight size={17} /></Link>
     </article>)}</div>
   </section>;
@@ -208,17 +201,28 @@ export function OfferingGrid({ vertical, items, hrefFor }: { vertical: Vertical;
 
 function ProcessSection() { return <section className="process-section"><div className="d-wrap"><Eyebrow>Simple from the start</Eyebrow><h2>A better clean.<br /><span className="highlight-text">A clear plan.</span></h2><div className="process-grid">{[{ title: 'Tell us about your property', text: 'Share the location, surfaces and what you need help with.' }, { title: 'We work out the right approach', text: 'Discuss access, water supply and a convenient time with the team.' }, { title: 'Your property gets a fresh start', text: 'Our mobile crew arrives with the agreed equipment and plan.' }].map((s,i) => <div key={s.title}><span>0{i+1}</span><h3>{s.title}</h3><p>{s.text}</p></div>)}</div></div></section>; }
 
+function HeroSearch({ placeholder, onSearch }: { placeholder: string; onSearch: (place: string) => void }) {
+  const [place, setPlace] = useState('');
+  return <form className="hero-search" onSubmit={event => { event.preventDefault(); onSearch(place); }}>
+    <input required maxLength={100} autoComplete="address-level2" aria-label={placeholder} placeholder={placeholder} value={place} onChange={event => setPlace(event.target.value)} />
+    <button className="d-button" type="submit">Search <ArrowRight size={17} /></button>
+  </form>;
+}
+
 export function ServicePage({ vertical, interest, sub }: { vertical: Vertical; interest?: string; sub?: SubVertical }) {
   const headline = sub?.title ?? vertical.headline;
   const summary = sub?.description ?? vertical.description;
   const home = vertical.slug === 'residential';
+  const [sought, setSought] = useState<string | null>(null);
+  useEffect(() => {
+    if (sought) document.getElementById('quote')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }, [sought]);
   return <DirectionShell><main id="main-content">
     <section className="service-hero">
       <VideoBackground mp4={sub?.film ?? vertical.film} poster={sub?.image ?? vertical.image} posterAlt={`${sub?.title ?? vertical.title} washing`} />
       <div className="service-overlay" />
-      <div className="d-wrap service-hero-inner">
-        <div className="service-hero-copy"><Eyebrow>{sub ? sub.careName : `${vertical.title} mobile wash`}</Eyebrow><h1>{headline.split('. ').map((line,i) => <span key={line} className={i ? 'accent' : ''}>{line}{i === 0 ? '.' : ''}{' '}</span>)}</h1><p>{summary}</p><a href="#offerings" className="inline-link">Explore {sub ? sub.title.toLowerCase() : vertical.title.toLowerCase()} services <ArrowRight size={18} /></a><div className="service-assurance"><span><Clock size={16} />24/7 service</span><span><Leaf size={16} />Eco-friendly products</span></div></div>
-        <QuoteFlow key={`${vertical.slug}-${sub?.slug ?? ''}-${interest ?? ''}`} vertical={vertical.slug} family={sub?.slug} initialAreas={interest === 'homecare' && home ? ['Home Care Club'] : []} />
+      <div className="d-wrap service-hero-inner is-search">
+        <div className="service-hero-copy"><Eyebrow>{sub ? sub.careName : `${vertical.title} mobile wash`}</Eyebrow><h1>{headline.split('. ').map((line,i) => <span key={line} className={i ? 'accent' : ''}>{line}{i === 0 ? '.' : ''}{' '}</span>)}</h1><p>{summary}</p><HeroSearch placeholder={home ? 'Enter your location for a free home assessment.' : 'Enter your location for a free site assessment.'} onSearch={setSought} /><div className="service-assurance"><span><Clock size={16} />24/7 service</span><span><Leaf size={16} />Eco-friendly products</span></div><a href="#offerings" className="inline-link">Explore {sub ? sub.title.toLowerCase() : vertical.title.toLowerCase()} services <ArrowRight size={18} /></a></div>
       </div>
     </section>
     <section className="d-wrap program-band"><p><strong>{home ? 'Home Care Club' : 'Ongoing Care'}</strong>{home ? 'A record of documented work at your home, with no membership fee.' : 'Tailored to each location, with a progress report after each shift.'}</p><Link className="inline-link" href={home ? '/#homecare' : '/#ongoing-care'}>{home ? 'About the Home Care Club' : 'About Ongoing Care'} <ArrowRight size={16} /></Link></section>
@@ -228,7 +232,7 @@ export function ServicePage({ vertical, interest, sub }: { vertical: Vertical; i
     </section> : <OfferingGrid vertical={vertical} />}
     <ProcessSection />
     <StoryCarousel first={sub?.story ?? vertical.story} />
-    <section className="d-wrap service-bottom"><h2>Not sure where to start?</h2><a className="d-button" href="#quote">{vertical.cta} <ArrowUpRight size={18} /></a><a href={h2go.phoneHref}>Or call {h2go.phone}</a></section>
+    <section className="d-wrap service-bottom"><div className="contact-panel"><div><h2>Not sure where to start?</h2><a className="contact-phone" href={h2go.phoneHref}><Phone size={20} />{h2go.phone}</a></div><QuoteFlow key={`${vertical.slug}-${sub?.slug ?? ''}-${interest ?? ''}-${sought ?? ''}`} id="quote" vertical={vertical.slug} family={sub?.slug} initialAreas={interest === 'homecare' && home ? ['Home Care Club'] : []} locationTitle={home ? 'Plan my free home assessment' : 'Request a free site assessment'} seededArea={sought ?? ''} skipLocation={sought !== null} /></div></section>
   </main></DirectionShell>;
 }
 
@@ -248,7 +252,7 @@ export function DetailPage({ vertical, offering, related, sub }: { vertical: Ver
   const to = (o: Offering) => serviceHref(vertical, o, sub);
   const home = vertical.slug === 'residential';
   return <DirectionShell><main id="main-content">
-    <section className="d-wrap detail-hero"><div><h1>{offering.title}</h1><p>{offering.description}</p><ul className="detail-points">{offering.services.map(service => <li key={service}><Check size={16} />{service}</li>)}</ul><a className="d-button" href="#quote">{vertical.cta} <ArrowUpRight size={18} /></a></div><div className="detail-photo"><Image src={offering.image} alt={offering.title} fill sizes="(min-width:800px) 50vw,100vw" priority /></div></section>
+    <section className="d-wrap detail-hero"><div><h1>{offering.title}</h1><p>{offering.description}</p><ul className="detail-points">{offering.services.map(service => <li key={service}><Check size={16} />{service}</li>)}</ul><AssessButton className="d-button">Request a FREE Assessment <ArrowUpRight size={18} /></AssessButton></div><div className="detail-photo"><Image src={offering.image} alt={offering.title} fill sizes="(min-width:800px) 50vw,100vw" priority /></div></section>
     <ProcessSection />
     <section className="d-wrap d-section detail-content">
       <div><Eyebrow>The right method matters</Eyebrow><h2>Power where you need it.<br /><span className="highlight-text">Care where it counts.</span></h2><p>Every surface and site is different. Before your wash, the team discusses the condition, material and access requirements to choose an appropriate approach.</p>
@@ -258,10 +262,10 @@ export function DetailPage({ vertical, offering, related, sub }: { vertical: Ver
           <details><summary>What does it cost?</summary><p>Pricing is confirmed during your free assessment, once the team understands the property.</p></details>
         </div>
       </div>
-      <QuoteFlow key={offering.slug} vertical={vertical.slug} family={sub?.slug} areas={sub ? [offering.title, ...offering.services] : undefined} initialAreas={[offering.title]} />
+      <QuoteFlow key={offering.slug} vertical={vertical.slug} family={sub?.slug} areas={sub ? [offering.title, ...offering.services] : undefined} initialAreas={[offering.title]} locationTitle={home ? 'Plan my free home assessment' : 'Request a free site assessment'} />
     </section>
     {offering.slug === 'deck-patio-power-washing' && <section className="d-wrap d-section comparison-section"><div><Eyebrow>See the difference</Eyebrow><h2>A little care.<br /><span className="highlight-text">A whole new outlook.</span></h2></div><ComparisonPreview /></section>}
-    <ProgramBanner vertical={vertical} sub={sub} href="#quote" />
+    <ProgramBanner vertical={vertical} sub={sub} />
     <StoryCarousel first={sub?.story ?? vertical.story} />
     {siblings.length > 0 && <section className="d-wrap related-section"><Eyebrow>While we’re here</Eyebrow><h2>More ways <span className="highlight-text">to refresh.</span></h2><div>{siblings.map(o=><Link key={o.slug} href={to(o)}>{o.title}<ArrowUpRight size={20}/></Link>)}</div></section>}
   </main></DirectionShell>;

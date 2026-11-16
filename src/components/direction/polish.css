@@ -184,6 +184,23 @@
 .choice-grid.is-pair .choice{min-width:168px;min-height:56px;padding-inline:22px;font-size:16px;text-align:center}
 .quote-actions .d-button:disabled{opacity:.45;transform:none;cursor:not-allowed}
 .quote-card .choice-grid{margin-bottom:4px}
+.hero-search{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin:22px 0 18px}
+.hero-search input{flex:0 1 auto;width:calc(35ch + 36px);max-width:100%;min-height:52px;padding:0 18px;border:0;border-radius:999px;background:#ffffffeb;color:var(--ink);font-size:15px}
+.hero-search input::placeholder{color:#5c6d80}
+.hero-search .d-button{min-height:52px;flex-shrink:0}
+.service-hero-inner.is-search{grid-template-columns:minmax(0,760px);align-items:center}
+.service-bottom{display:block}
+.service-bottom .contact-panel{align-items:start}
+.service-bottom h2{font-size:clamp(34px,3.6vw,52px)}
+.service-bottom .contact-phone{margin-top:22px}
+button.inline-link,button.footer-assess,button.d-mobile-assess{border:0;background:none;padding:0;font:inherit;color:inherit;cursor:pointer;text-align:left}
+button.footer-assess{display:block}
+.d-mobile button.d-mobile-assess{display:flex;align-items:center;justify-content:space-between;width:100%;padding:14px 0;border-bottom:1px solid #dce5ef;font-size:15px;font-weight:550}
+.assess-modal{position:fixed;inset:0;z-index:80;display:grid;place-items:center;padding:24px;background:#06101899}
+.assess-dialog{position:relative;width:min(640px,100%);max-height:calc(100svh - 48px);padding:0;background:transparent;box-shadow:none}
+.assess-dialog .quote-card{max-height:calc(100svh - 48px);overflow:auto;box-shadow:0 28px 70px -28px #061018e6}
+.assess-dialog .quote-top{padding-right:40px}
+.assess-close{position:absolute;top:14px;right:14px;display:grid;place-items:center;width:36px;height:36px;border:0;border-radius:50%;background:#f1f5f9;color:var(--navy);cursor:pointer}
 .quote-card.hero-prompt label{margin-bottom:0}
 .hero-prompt .prompt-fields :is(input,select,textarea){min-height:56px;margin-top:0;padding:14px 16px;text-overflow:ellipsis}
 .hero-prompt .prompt-fields select{appearance:none;padding-right:48px;background-color:#f8fafc;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%235c6d80' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='m6 9 6 6 6-6'/></svg>");background-repeat:no-repeat;background-position:right 16px center;background-size:16px;text-overflow:ellipsis}
