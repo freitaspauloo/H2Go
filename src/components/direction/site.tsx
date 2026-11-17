@@ -214,15 +214,12 @@ export function ServicePage({ vertical, interest, sub }: { vertical: Vertical; i
   const summary = sub?.description ?? vertical.description;
   const home = vertical.slug === 'residential';
   const [sought, setSought] = useState<string | null>(null);
-  useEffect(() => {
-    if (sought) document.getElementById('quote')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-  }, [sought]);
   return <DirectionShell><main id="main-content">
     <section className="service-hero">
       <VideoBackground mp4={sub?.film ?? vertical.film} poster={sub?.image ?? vertical.image} posterAlt={`${sub?.title ?? vertical.title} washing`} />
       <div className="service-overlay" />
       <div className="d-wrap service-hero-inner is-search">
-        <div className="service-hero-copy"><Eyebrow>{sub ? sub.careName : `${vertical.title} mobile wash`}</Eyebrow><h1>{headline.split('. ').map((line,i) => <span key={line} className={i ? 'accent' : ''}>{line}{i === 0 ? '.' : ''}{' '}</span>)}</h1><p>{summary}</p><HeroSearch placeholder={home ? 'Enter your location for a free home assessment.' : 'Enter your location for a free site assessment.'} onSearch={setSought} /><div className="service-assurance"><span><Clock size={16} />24/7 service</span><span><Leaf size={16} />Eco-friendly products</span></div><a href="#offerings" className="inline-link">Explore {sub ? sub.title.toLowerCase() : vertical.title.toLowerCase()} services <ArrowRight size={18} /></a></div>
+        <div className="service-hero-copy"><Eyebrow>{sub ? sub.careName : `${vertical.title} mobile wash`}</Eyebrow><h1>{headline.split('. ').map((line,i) => <span key={line} className={i ? 'accent' : ''}>{line}{i === 0 ? '.' : ''}{' '}</span>)}</h1><p>{summary}</p>{sought ? <QuoteFlow layout="hero" id="hero-quote" vertical={vertical.slug} family={sub?.slug} initialAreas={interest === 'homecare' && home ? ['Home Care Club'] : []} seededArea={sought} skipLocation /> : <HeroSearch placeholder={home ? 'Enter your location for a free home assessment.' : 'Enter your location for a free site assessment.'} onSearch={setSought} />}<div className="service-assurance"><span><Clock size={16} />24/7 service</span><span><Leaf size={16} />Eco-friendly products</span></div><a href="#offerings" className="inline-link">Explore {sub ? sub.title.toLowerCase() : vertical.title.toLowerCase()} services <ArrowRight size={18} /></a></div>
       </div>
     </section>
     <section className="d-wrap program-band"><p><strong>{home ? 'Home Care Club' : 'Ongoing Care'}</strong>{home ? 'A record of documented work at your home, with no membership fee.' : 'Tailored to each location, with a progress report after each shift.'}</p><Link className="inline-link" href={home ? '/#homecare' : '/#ongoing-care'}>{home ? 'About the Home Care Club' : 'About Ongoing Care'} <ArrowRight size={16} /></Link></section>
@@ -232,7 +229,7 @@ export function ServicePage({ vertical, interest, sub }: { vertical: Vertical; i
     </section> : <OfferingGrid vertical={vertical} />}
     <ProcessSection />
     <StoryCarousel first={sub?.story ?? vertical.story} />
-    <section className="d-wrap service-bottom"><div className="contact-panel"><div><h2>Not sure where to start?</h2><a className="contact-phone" href={h2go.phoneHref}><Phone size={20} />{h2go.phone}</a></div><QuoteFlow key={`${vertical.slug}-${sub?.slug ?? ''}-${interest ?? ''}-${sought ?? ''}`} id="quote" vertical={vertical.slug} family={sub?.slug} initialAreas={interest === 'homecare' && home ? ['Home Care Club'] : []} locationTitle={home ? 'Plan my free home assessment' : 'Request a free site assessment'} seededArea={sought ?? ''} skipLocation={sought !== null} /></div></section>
+    <section className="d-wrap service-bottom"><div className="contact-panel"><div><h2>Not sure where to start?</h2><a className="contact-phone" href={h2go.phoneHref}><Phone size={20} />{h2go.phone}</a></div><QuoteFlow key={`${vertical.slug}-${sub?.slug ?? ''}-${interest ?? ''}`} id="quote" vertical={vertical.slug} family={sub?.slug} initialAreas={interest === 'homecare' && home ? ['Home Care Club'] : []} locationTitle={home ? 'Plan my free home assessment' : 'Request a free site assessment'} /></div></section>
   </main></DirectionShell>;
 }
 

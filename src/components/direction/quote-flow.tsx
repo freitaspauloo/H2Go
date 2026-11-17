@@ -16,7 +16,7 @@ const phaseCopy: Record<Phase, [string, string]> = {
 };
 const phaseLabel: Record<Phase, string> = {
   location: 'Location',
-  audience: 'Who',
+  audience: 'Type',
   family: 'Business',
   areas: 'Services',
   contact: 'Your details',
@@ -210,9 +210,9 @@ function AssessmentFlow({ variant, id, lockedAudience, lockedFamily = '', initia
   </div>;
 }
 
-export function QuoteFlow({ vertical, family, initialAreas, areas, id = 'quote', locationTitle, seededArea, skipLocation }: { vertical?: string; family?: string; initialAreas?: string[]; areas?: string[]; id?: string; locationTitle?: string; seededArea?: string; skipLocation?: boolean }) {
+export function QuoteFlow({ vertical, family, initialAreas, areas, id = 'quote', locationTitle, seededArea, skipLocation, layout = 'card' }: { vertical?: string; family?: string; initialAreas?: string[]; areas?: string[]; id?: string; locationTitle?: string; seededArea?: string; skipLocation?: boolean; layout?: 'hero' | 'card' }) {
   const audience = vertical === 'commercial' || vertical === 'residential' ? vertical : undefined;
-  return <AssessmentFlow variant="card" id={id} lockedAudience={audience} lockedFamily={family} initialAreas={initialAreas} areas={areas} locationTitle={locationTitle} seededArea={seededArea} skipLocation={skipLocation} />;
+  return <AssessmentFlow variant={layout} id={id} lockedAudience={audience} lockedFamily={family} initialAreas={initialAreas} areas={areas} locationTitle={locationTitle} seededArea={seededArea} skipLocation={skipLocation} />;
 }
 
 /** Homepage hero. Same steps as the page forms, laid out as one wide bar. */
