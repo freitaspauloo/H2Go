@@ -170,7 +170,7 @@ export function OngoingCare() { return <ProgramBanner vertical={verticals[1]} id
 
 export function CarePage() {
   return <DirectionShell><main id="main-content">
-    <section className="d-wrap d-section care-intro"><Eyebrow>Care Club</Eyebrow><h1>Residential and commercial care.</h1><p>One menu entry, two clubs. Both names are provisional.</p></section>
+    <section className="d-wrap d-section care-intro"><h1>Residential and commercial care.</h1><p>One menu entry, two clubs. Both names are provisional.</p></section>
     <section className="d-wrap care-clubs">
       <article id="residential-care"><Eyebrow>Residential</Eyebrow><h2>Home Care Club</h2><p>A record of documented H2GO work at your home. You can keep it and share it. You approve the plan, and there is no membership fee.</p><ul>{['No membership fee. One recurring service is enough to join.', 'You approve your care plan and pricing each year.', 'Change or cancel future services anytime, with no clawback on completed work.', 'You pay after each completed visit.'].map(text => <li key={text}><Check size={17} />{text}</li>)}</ul><AssessButton className="d-button">Request a FREE Assessment <ArrowUpRight size={18} /></AssessButton></article>
       <article id="commercial-care"><Eyebrow>Commercial</Eyebrow><h2>Commercial Care Club</h2><p>Tailored to each location, with a progress report after each shift. You approve the plan.</p><ul>{['A progress report after each shift.', 'The plan is tailored to the site.'].map(text => <li key={text}><Check size={17} />{text}</li>)}</ul><AssessButton className="d-button">Request a FREE Assessment <ArrowUpRight size={18} /></AssessButton></article>
@@ -284,7 +284,7 @@ export function ServicePage({ vertical, interest, sub }: { vertical: Vertical; i
     </section> : <OfferingGrid vertical={vertical} />}
     <ProcessSection />
     {sub && sub.story === undefined ? <section className="d-wrap d-section site-prompt"><Eyebrow>Your site</Eyebrow><h2>Tell us about <span className="highlight-text">your site.</span></h2><p>Share the location and the work you have in mind. H2GO confirms the approach during a free site assessment.</p><AssessButton className="d-button">Request a FREE Assessment <ArrowUpRight size={18} /></AssessButton></section> : <StoryCarousel first={sub?.story ?? vertical.story} />}
-    {home && <section className="ads-quote" id="ads"><div className="d-wrap"><div className="ads-quote-card"><span>Placeholder</span><blockquote><p>The A.D.S. story will go here once H2GO approves the wording.</p></blockquote><p>Not final copy. The story follows once H2GO sends it.</p></div></div></section>}
+    {home && <section className="ads-quote" id="ads"><div className="d-wrap"><figure className="ads-quote-card"><span aria-hidden="true">“</span><blockquote><p>The A.D.S. story will go here once H2GO approves the wording.</p></blockquote><figcaption>Placeholder. The story follows once H2GO sends it.</figcaption></figure></div></section>}
     <section className="d-wrap service-bottom"><div className="contact-panel"><div><h2>Not sure where to start?</h2><a className="contact-phone" href={h2go.phoneHref}><Phone size={20} />{h2go.phone}</a></div><QuoteFlow key={`${vertical.slug}-${sub?.slug ?? ''}-${interest ?? ''}`} id="quote" vertical={vertical.slug} family={sub?.slug} initialAreas={interest === 'homecare' && home ? ['Home Care Club'] : []} locationTitle={home ? 'Plan my free home assessment' : 'Request a free site assessment'} /></div></section>
   </main></DirectionShell>;
 }

@@ -60,8 +60,10 @@
 .d-header.is-clear .nav-drop a{color:var(--ink)}
 .d-mobile-label{margin:14px 0 0;font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
 .d-mobile a[aria-current="page"]{box-shadow:inset 0 -2px 0 currentColor}
-.ads-placeholder,.about-placeholder,.site-prompt,.care-intro{max-width:760px}
+.ads-placeholder,.about-placeholder,.site-prompt{max-width:760px}
 .ads-placeholder p,.about-placeholder p,.site-prompt p,.care-intro p{color:var(--muted);max-width:560px}
+.care-intro{max-width:none;text-align:left}
+.care-intro h1,.care-intro p{text-align:left}
 .care-clubs{display:grid;grid-template-columns:1fr 1fr;gap:28px;padding-bottom:80px}
 .care-clubs article{padding:32px;border-radius:22px;background:white}
 .care-clubs ul{display:grid;gap:10px;margin:18px 0 24px;padding:0;list-style:none}
@@ -329,14 +331,13 @@ button.footer-assess{display:block}
 /* Section rhythm */
 .process-section+.stories-section{margin-top:0;background:transparent}
 .care-banner+.stories-section{margin-top:0}
-.ads-quote{padding:72px 0 16px}
-.ads-quote .d-wrap{max-width:920px}
-.ads-quote-card{padding:36px 40px 28px;border:1.5px dashed #b7c7d6;border-radius:28px;background:#f8fafc}
-.ads-quote-card>span{display:inline-block;margin-bottom:14px;padding:4px 10px;border-radius:999px;background:#e7eef5;color:#6d8296;font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase}
-.ads-quote-card blockquote{margin:0}
-.ads-quote-card blockquote p{margin:0;max-width:18em;color:#8aa0b4;font-size:clamp(28px,3vw,40px);font-weight:500;line-height:1.25;letter-spacing:-.02em}
-.ads-quote-card blockquote p::before{content:'“';display:block;margin-bottom:10px;color:#9fd8e6;font-size:64px;line-height:.7}
-.ads-quote-card>p{margin:22px 0 0;color:#8aa0b4;font-size:14px}
+.ads-quote{padding:0}
+.ads-quote-card{display:grid;grid-template-columns:64px minmax(0,1fr);column-gap:8px;row-gap:22px;align-items:start;margin:0;padding:44px 48px 32px;background:white;border:1px solid #d1deea;border-radius:24px}
+.ads-quote-card>span{color:var(--blue);font-family:var(--font-inter-tight),var(--font-inter),sans-serif;font-size:88px;font-weight:600;line-height:.72}
+.ads-quote-card blockquote{margin:8px 0 0}
+.ads-quote-card blockquote p{margin:0;max-width:16em;color:var(--navy);font-family:var(--font-inter-tight),var(--font-inter),sans-serif;font-size:clamp(30px,3vw,42px);font-weight:500;line-height:1.16;letter-spacing:-.035em}
+.ads-quote-card figcaption{grid-column:2;margin:0;padding-top:20px;border-top:1px solid #dce6ef;color:var(--muted);font-size:14px}
+@media(max-width:800px){.ads-quote-card{grid-template-columns:1fr;row-gap:8px;padding:28px 24px 22px}.ads-quote-card>span{font-size:64px;line-height:.6}.ads-quote-card figcaption{grid-column:1}}
 .detail-content+.care-banner,.comparison-section+.care-banner{margin-top:0}
 .comparison-images{cursor:ew-resize;touch-action:none;user-select:none}
 .comparison-images:focus-visible{outline:3px solid var(--blue);outline-offset:5px}
