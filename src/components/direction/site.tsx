@@ -242,9 +242,9 @@ export function OfferingGrid({ vertical, items, hrefFor }: { vertical: Vertical;
       <div className="market-shade" />
       <Link className="offering-main" href={to(o)} aria-label={`Explore ${o.title}`}>
         <span className="circle-arrow card-arrow"><ArrowUpRight size={22} /></span>
+        <div className="card-subs">{o.services.map(name => <span key={name}>{name}</span>)}</div>
         <h3>{o.title}</h3>
         <p>{o.description}</p>
-        <p className="offering-services">{o.services.join(' · ')}</p>
       </Link>
       <div className="offering-help">
         <button className="offering-toggle" aria-expanded={open === o.slug} aria-controls={`offering-${o.slug}`} onClick={() => setOpen(open === o.slug ? null : o.slug)}><span>How we help</span><Plus size={18} /></button>
