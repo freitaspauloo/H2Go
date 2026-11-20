@@ -2,7 +2,22 @@
 // Industrial, property management and fleet live inside Commercial.
 // Service descriptions are existing-site placeholders until Offer V1.
 export type Offering = { slug: string; title: string; image: string; description: string; services: string[] };
-export type SubVertical = { slug: string; title: string; careName: string; description: string; image: string; film?: string; story?: number; types: Offering[] };
+export type SubVertical = {
+  slug: string;
+  title: string;
+  /** Kept for older references. Care badges are not shown on commercial cards. */
+  careName: string;
+  description: string;
+  image: string;
+  film?: string;
+  /** Set only when this group has an approved project example. */
+  story?: number;
+  /** When true, each type is a sub-link on the commercial card. */
+  linked?: boolean;
+  /** Specialty card also sends home visitors to Residential. */
+  homeLink?: boolean;
+  types: Offering[];
+};
 export type Vertical = {
   slug: string;
   title: string;
@@ -32,7 +47,7 @@ export const verticals: Vertical[] = [
     title: 'Residential',
     label: 'For the place you call home',
     headline: 'A fresh start. Right outside your door.',
-    description: 'House, driveway, deck, windows, fence and pool. Choose what needs attention, then plan a free home assessment.',
+    description: 'House, driveway, deck, windows and fence. Choose what needs attention, then plan a free home assessment.',
     image: '/h2go/house.jpg',
     film: '/h2go/video/residential-wash.mp4',
     story: 0,
@@ -40,11 +55,11 @@ export const verticals: Vertical[] = [
     subverticals: [],
     offerings: [
       type('house-washing', 'House washing', 'house-wash.jpg', 'Refresh siding, brick and exterior surfaces with a wash suited to your home.', ['Home exterior wash']),
-      type('driveways', 'Driveways', 'driveway.jpg', 'Lift built-up dirt from concrete, paved and interlocking driveways.', ['Driveway cleaning', 'Interlock cleaning']),
+      type('driveways', 'Driveways', 'driveway.jpg', 'Lift built-up dirt from concrete, paved and interlocking driveways.', ['Driveway cleaning', 'Interlock cleaning', 'Interlock sanding and sealing', 'Interlock lift and re-lay', 'Asphalt sealing']),
       type('deck-patio-power-washing', 'Deck and patio', 'deck.jpg', 'Bring outdoor gathering spaces back into use with surface-appropriate cleaning.', ['Deck cleaning', 'Patio cleaning']),
       type('window-cleaning', 'Windows', 'window.jpg', 'Clear away exterior dirt and residue for a cleaner view.', ['Window cleaning']),
       type('fence-power-washing', 'Fences', 'fence.jpg', 'Remove weathered buildup while choosing a method suited to the fence material.', ['Fence cleaning']),
-      type('pool-power-washing', 'Pools', 'patio.jpg', 'Plan a clean for pool surfaces and the outdoor areas around them.', ['Pool cleaning']),
+      type('solar-panel-cleaning', 'Solar panels', 'house.jpg', 'Clean solar panels so the surface can do its job.', ['Solar panel cleaning']),
     ],
   },
   {
@@ -61,59 +76,115 @@ export const verticals: Vertical[] = [
     subverticals: [
       {
         slug: 'property-management',
-        title: 'Property management and condo',
-        careName: 'Property Care',
-        description: 'Facades, entrances and common areas for buildings with more than one household.',
+        title: 'Property Management & Condos',
+        careName: 'Care Club',
+        description: 'Condos, apartments, commercial buildings and property portfolios.',
         image: '/h2go/apartment.jpg',
         types: [
-          type('apartments-condos', 'Apartments and condos', 'apartment.jpg', 'Coordinate cleaning for facades, entrances and common areas.', ['Building exterior wash', 'Entrance and common-area wash']),
-          type('commercial-properties', 'Commercial properties', 'job-1.jpg', 'Care for offices and high-traffic exterior spaces.', ['Exterior property wash']),
+          type('property-wash', 'Property wash', 'apartment.jpg', 'Facades, entrances and common areas for buildings with more than one household.', ['Building exterior wash', 'Entrance and common-area wash']),
         ],
       },
       {
-        slug: 'retail-parking',
-        title: 'Retail, restaurants and parking',
-        careName: 'Facility Care',
-        description: 'Storefronts, hospitality sites, parking areas and the grounds around them.',
+        slug: 'parking-garages',
+        title: 'Parking Garages & Lots',
+        careName: 'Care Club',
+        description: 'Parking garages, surface lots and managed parking facilities.',
         image: '/h2go/parking-garage.jpg',
         types: [
-          type('parking-facilities', 'Parking facilities', 'parking-garage.jpg', 'Remove accumulated dirt from garages and parking areas.', ['Parking garage wash']),
-          type('commercial-windows', 'Commercial windows', 'commercial-window.jpg', 'Schedule exterior window washing for your building.', ['Exterior window washing']),
-          type('graffiti-removal', 'Graffiti removal', 'graffiti.png', 'Arrange targeted removal or recurring graffiti management.', ['Graffiti removal']),
+          type('parking-wash', 'Parking wash', 'parking-garage.jpg', 'Garages, surface lots and the areas around them.', ['Parking garage wash', 'Parking lot sweeping', 'Asphalt sealing']),
         ],
       },
       {
-        slug: 'industrial-construction',
-        title: 'Industrial and construction',
-        careName: 'Facility Care',
-        description: 'Warehouses, plants, equipment and active construction sites.',
-        image: '/h2go/social-3.jpg',
+        slug: 'retail-restaurants-automotive',
+        title: 'Retail, Restaurants & Automotive',
+        careName: 'Care Club',
+        description: 'Restaurants, shops and malls, gas stations, car dealerships and service shops.',
+        image: '/h2go/job-1.jpg',
+        linked: true,
         types: [
-          type('factory-maintenance', 'Factory maintenance', 'social-3.jpg', 'Plan cleaning for production areas, floors and facility exteriors.', ['Facility exterior wash', 'Floor cleaning']),
-          type('equipment-cleaning', 'Equipment cleaning', 'job-4.jpg', 'Remove accumulated grease and dirt from working machinery.', ['Equipment wash']),
-          type('spill-cleanup', 'Spill cleanup', 'social-1.jpg', 'Discuss the material, location and response requirements with the team.', ['Spill cleanup']),
+          type('restaurants-shops', 'Restaurants & Shops', 'job-1.jpg', 'Storefronts, restaurants and retail sites.', ['Storefront wash', 'Exterior window washing']),
+          type('gas-stations', 'Gas Stations', 'social-1.jpg', 'Fuel sites and the paved areas around them.', ['Forecourt wash']),
+          type('dealerships-service-shops', 'Dealerships & Service Shops', 'job-4.jpg', 'Dealership lots and service-shop exteriors.', ['Lot wash', 'Exterior wash']),
+        ],
+      },
+      {
+        slug: 'hospitality-recreation',
+        title: 'Hospitality & Recreation',
+        careName: 'Care Club',
+        description: 'Hotels, golf courses, marinas, campgrounds, wineries and event venues.',
+        image: '/h2go/deck.jpg',
+        types: [
+          type('hospitality-wash', 'Hospitality wash', 'deck.jpg', 'Exterior cleaning for hospitality and recreation sites.', ['Building exterior wash', 'Grounds cleaning']),
+        ],
+      },
+      {
+        slug: 'industrial-food',
+        title: 'Industrial & Food Processing',
+        careName: 'Care Club',
+        description: 'Warehouses, manufacturing plants and food and beverage facilities.',
+        image: '/h2go/social-3.jpg',
+        linked: true,
+        types: [
+          type('warehouses-manufacturing', 'Warehouses & Manufacturing', 'social-3.jpg', 'Warehouses, plants and working equipment.', ['Facility exterior wash', 'Equipment wash', 'Power flushing']),
+          type('food-beverage', 'Food & Beverage Facilities', 'job-4.jpg', 'Food and beverage production sites.', ['Facility exterior wash', 'Floor cleaning']),
+        ],
+      },
+      {
+        slug: 'construction-development',
+        title: 'Construction & Development',
+        careName: 'Care Club',
+        description: 'Builders and contractors. Exterior cleaning only.',
+        image: '/h2go/social-1.jpg',
+        types: [
+          type('construction-exterior', 'Exterior site wash', 'social-1.jpg', 'Exterior cleaning for active construction sites.', ['Exterior construction-site wash']),
         ],
       },
       {
         slug: 'municipal-institutional',
-        title: 'Municipal and institutional',
-        careName: 'District Care',
-        description: 'Public buildings, healthcare and education sites.',
+        title: 'Municipal & Institutional',
+        careName: 'Care Club',
+        description: 'Cities, BIAs, hospitals, long-term care, schools, campuses and utilities.',
         image: '/h2go/hospital-project.jpg',
+        story: 1,
+        linked: true,
         types: [
-          type('institutional-buildings', 'Institutional buildings', 'hospital-project.jpg', 'Exterior and grounds care for healthcare, education and civic buildings.', ['Building exterior wash', 'Grounds cleaning']),
+          type('municipalities-bias', 'Municipalities & BIAs', 'hospital-project.jpg', 'Civic buildings and business-improvement areas.', ['Building exterior wash', 'Grounds cleaning']),
+          type('healthcare-long-term-care', 'Healthcare & Long-Term Care', 'hospital-project.jpg', 'Hospitals and long-term care sites.', ['Building exterior wash']),
+          type('education', 'Education', 'job-1.jpg', 'Schools and campuses.', ['Building exterior wash', 'Grounds cleaning']),
+          type('utilities', 'Utilities', 'social-3.jpg', 'Utility sites and the grounds around them.', ['Site wash']),
         ],
       },
       {
-        slug: 'fleet',
-        title: 'Fleet',
-        careName: 'Fleet Care',
-        description: 'On-site vehicle washing for transportation, logistics and any business with a fleet.',
+        slug: 'fleet-logistics',
+        title: 'Fleet & Logistics',
+        careName: 'Care Club',
+        description: 'Vehicle fleets, terminals, yards, loading areas and wash bays.',
         image: '/h2go/fleet.jpg',
         film: '/h2go/video/fleet-wash.mp4',
         story: 2,
         types: [
-          type('fleet-washing', 'Fleet washing', 'fleet.jpg', 'Keep work vehicles clean with an on-site wash schedule.', ['Fleet wash']),
+          type('fleet-washing', 'Fleet wash', 'fleet.jpg', 'On-site washing for vehicles, yards and wash bays.', ['Fleet wash']),
+        ],
+      },
+      {
+        slug: 'farms-agriculture',
+        title: 'Farms & Agriculture',
+        careName: 'Care Club',
+        description: 'Farm buildings, barns, equipment, greenhouses and nurseries.',
+        image: '/h2go/house-wash.jpg',
+        types: [
+          type('agricultural-wash', 'Agricultural wash', 'house-wash.jpg', 'Farm buildings, barns, equipment, greenhouses and nurseries.', ['Agricultural wash']),
+        ],
+      },
+      {
+        slug: 'specialty',
+        title: 'Specialty',
+        careName: 'Care Club',
+        description: 'Unusual or one-off jobs outside the other groups. You say it, we spray it. Assessed case by case.',
+        image: '/h2go/graffiti.png',
+        homeLink: true,
+        types: [
+          type('specialty-wash', 'Specialty wash', 'graffiti.png', 'Tell us about the job. H2GO assesses it case by case.', ['Specialty wash']),
         ],
       },
     ],
